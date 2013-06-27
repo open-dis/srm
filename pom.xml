@@ -25,7 +25,7 @@
     </parent>
     <scm>
         <url>http://svn.code.sf.net/p/open-dis/code</url>
-        <connection>svm:svn:http://svn.code.sf.net/p/open-dis/code</connection>
+        <connection>scm:svn:http://svn.code.sf.net/p/open-dis/code</connection>
     </scm>
     <dependencies>
         <dependency>
