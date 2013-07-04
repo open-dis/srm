@@ -9,9 +9,10 @@
     <url>http://www.sedris.org/srm.htm</url>
     <licenses>
         <license>
-            <name></name>
-            <url></url>
+            <name>SEDRIS License</name>
+            <url>http://svn.code.sf.net/p/open-dis/code/license.txt</url>
             <distribution>repo</distribution>
+            <comment>A minor variation of the Mozilla Public License</comment>
         </license>
     </licenses>
     <organization>
