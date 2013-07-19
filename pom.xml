@@ -9,8 +9,8 @@
     <url>http://www.sedris.org/srm.htm</url>
     <licenses>
         <license>
-            <name>SEDRIS License</name>
-            <url>http://svn.code.sf.net/p/open-dis/code/license.txt</url>
+            <name>SEDRIS License Agreement</name>
+            <url>http://sedris.org/download/core/license_code.php?filename=srm_java_sdk_4.4.tgz&product=sc_comp</url>
             <distribution>repo</distribution>
             <comment>A minor variation of the Mozilla Public License</comment>
         </license>
