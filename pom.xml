@@ -12,7 +12,7 @@
             <name>SEDRIS License Agreement</name>
             <url>http://sedris.org/download/core/license_code.php?filename=srm_java_sdk_4.4.tgz&amp;product=sc_comp</url>
             <distribution>repo</distribution>
-            <comment>A minor variation of the Mozilla Public License</comment>
+            <comments>A minor variation of the Mozilla Public License</comments>
         </license>
     </licenses>
     <organization>
