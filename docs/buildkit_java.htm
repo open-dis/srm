@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>SRM SDK - Build Kit</title>
+<style type="text/css">
+<!--
+.indented
+{
+    padding-left: 32pt;
+    padding-right: 32pt;
+}
+-->
+</style>
+</head>
+<body bgcolor="#ffffff">
+
+<div align="center">
+<h1><a name="top">Build Kit</a></h1>
+</div>
+<div align="center">
+<h3>
+SRM SDK Release 4.4.0
+</h3>
+<h3>
+January 21, 2010
+</h3>
+</div>
+
+<p>
+<ol>
+<li><a href="#intro">Introduction</a>
+</li>
+<li><a href="#platform">Supported Platforms And Compilers</a>
+</li>
+<li><a href="#reqmts">Build Requirements</a>
+</li>
+<li><a href="#compiling">Compiling</a>
+</li>
+<li><a href="#testing">Testing the Build</a>
+</li>
+<li><a href="#libs">Using the Libraries</a>
+</li>
+<li><a href="#problems">Problems with the Build</a>
+</li>
+<li><a href="#recom">Recommended Reading</a>
+</li>
+<li><a href="#bugs">Bug Reports and Feedback</a>
+</li>
+<li><a href="#webpages">Web Pages</a>
+</li>
+</ol>
+</p>
+<br>
+
+<h3><a name="intro">Introduction</a></h3>
+<div class="indented">
+<p>
+This page covers instructions on how to compile this SRM SDK. In addition, it
+provides steps that can be used to verify that the compilation completed
+successfully.
+</p><p>
+<b>NOTE:</b> This document is intended for those users who are building the SRM
+libraries from the source. Pre-compiled (bytecode) distributions in Jar file
+are available for download from the
+<a href="http://www.sedris.org">SEDRIS Web Site</a>.
+</p><p>
+For general information about this release, where to obtain it, and items
+that require specific attention, see the <a href="index.htm">Release Notes</a>.
+</p><p>
+For help, comments, and bug reports please send email to
+<a href="mailto:help@sedris.org">help@sedris.org</a>. If you are an associate,
+please use <a href="mailto:se-coders@sedris.org">se-coders@sedris.org</a>.
+</p><p>
+Return to: <a href="#top">Top</a>
+</p>
+</div>
+
+<h3><a name="platform">Supported Platforms And Compilers</a></h3>
+<div class="indented">
+<p>
+The SRM source code can be compiled in any platform supporting a Java version
+5 compiler and Runtime Environment.
+</p><p>
+Return to: <a href="#top">Top</a>
+</p>
+</div>
+
+<h3><a name="reqmts">Build Requirements</a></h3>
+<div class="indented">
+<p>
+The SRM software will compile and work &quot;out-of-the-box&quot on all
+systems supporting Java version 5 compiler.  A Java version 5 compiler can be
+downloaded from the <a href="http://java.sun.com/j2se/1.5.0">java.sun.com</a>
+website.
+</p><p>
+Return to: <a href="#top">Top</a>
+</p>
+</div>
+
+<h3><a name="compiling">Compiling</a></h3>
+<div class="indented">
+<dl>
+<dt><b>Unix: </b>Execute the build_srm.sh script.
+<p>
+<dt><b>Win32:</b>Execute the build_srm.bat script
+</dl>
+
+
+The following files are created upon its completion:
+<ul>
+<li>The srm.jar file is created under the lib/ directory
+</li>
+<li>The sample application in bytecode CdToCcConv.class is created under the bin/ directory.
+</li>
+</ul>
+
+<p>
+If you have any errors reported by the build process, see
+<a href="#problems">Problems with the Build</a>.
+</p><p>
+Return to: <a href="#top">Top</a>
+</p>
+</div>
+
+<h3><a name="testing">Testing the Build</a></h3>
+<div class="indented">
+<p>
+Use the following commands to run the sample application CdToCcConv:
+</p>
+<dl>
+<dt><b>Unix:</b> java -classpath "lib/srm.jar:bin" CdToCcConv
+
+<p>
+<dt><b>Win32:</b> java -classpath "lib\srm.jar;bin" CdToCcConv
+
+</dl>
+
+<p>The user should see the following output on the screen:
+<pre>
+*** Sample program using SRM Java API to convert a 3D coordinate
+*** from a Celestiodetic SRF to a Celestiocentric SRF.
+CdSrf parameter =&gt;
+orm: ORMCOD_WGS_1984
+rt: RTCOD_WGS_1984_IDENTITY
+CcSrf parameter =&gt;
+orm: ORMCOD_WGS_1984
+rt: RTCOD_WGS_1984_IDENTITY
+CdCoord components (source) =&gt;
+[ 0.17453292519943295, 0.3490658503988659, 100.0 ]
+CcCoord components (destination) =&gt;
+[ 5904838.698311626, 1041182.3792437915, 2167730.9898430835 ] is VALID
+</pre>
+
+<p>
+If you see something like what is shown above, you have successfully compiled
+the SRM SDK!
+</p><p>
+Return to: <a href="#top">Top</a>
+</p>
+</div>
+
+<h3><a name="libs">Using the Libraries</a></h3>
+<div class="indented">
+<p>
+To compile an application using the the classes defined in the srm.jar,
+import the srm classes in the application file as follows:
+</p>
+<dd>
+   <p>import SRM.*;
+</dd>
+<p>
+To run an application using the srm.jar, set the command line flag as follows:
+<dd>
+   <p>java -classpath "&lt;path&gt;/srm.jar:&lt;other stuff&gt;" &lt;user app&gt;
+</dd>
+<p>
+Return to: <a href="#top">Top</a>
+</p>
+</div>
+
+<h3><a name="problems">Problems with the Build</a></h3>
+<div class="indented">
+<dl>
+<dt><b>Why am I having errors using my Java compiler?</b></dt>
+<dd>Make sure that you have a Java version 5 compiler properly installed on your
+    system and that it is accessible.
+<br><br></dd>
+<dt><b>Why am I having problems running my application?</b></dt>
+<dd>Make sure that you have a Java version 5 Runtime Environment properly
+    installed on your system.<br><br></dd>
+</dl>
+<p>
+Return to: <a href="#top">Top</a>
+</p>
+</div>
+
+<h3><a name="recom">Recommended Reading</a></h3>
+<div class="indented">
+<p>
+<ul>
+<li><a href="users_guide_java.htm">SRM SDK Users' Guide</a>
+</li>
+</ul>
+<p>Return to: <a href="#top">Top</a>
+</div>
+
+<h3><a name="bugs">Bug Reports and Feedback</a></h3>
+<div class="indented">
+<p>For help, comments, and bug reports please send email to
+<a href="mailto:help@sedris.org">help@sedris.org</a>. If you are an associate, please use
+<a href="mailto:se-coders@sedris.org">se-coders@sedris.org</a>.
+<p>Return to: <a href="#top">Top</a>
+</div>
+
+<h3><a name="webpages">Web Pages</a></h3>
+<div class="indented">
+<p>These links require Internet access.
+<ul>
+<li><a href="http://www.sedris.org/srm.htm">SRM at the SEDRIS Web Site</a>
+</li>
+<li><a href="http://www.sedris.org/">SEDRIS (www.sedris.org)</a>
+</li>
+<li><a href="http://www.sedris.org/dwn4trpl.htm">SEDRIS Technologies SDK Downloads</a>
+</li>
+<li><a href="http://www.sedris.org/pro_trpl.htm">SEDRIS Technologies Documents</a>
+</li>
+<li><a href="http://tools.sedris.org/">SEDRIS Tools</a>
+</li>
+</ul>
+<p>Return to: <a href="#top">Top</a>
+</p>
+</div>
+
+<p>
+Copyright &copy; 2010 <a href="http://www.sedris.org">SEDRIS</a>&#153;
+
+</p>
+</body>
+</html>

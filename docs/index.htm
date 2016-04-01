@@ -1,0 +1,376 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SRM SDK - Release Notes</title>
+</head>
+<body bgcolor="#ffffff">
+
+<div align="center"><h1><a name="top">Release Notes</a></h1></div>
+<div align="center">
+<h3>
+SRM SDK Release 4.4.0
+</h3>
+<h3>
+January 21, 2010
+</h3>
+</div>
+
+<br><br>
+<ol>
+<li><a href="#intro">Introduction</a>
+</li>
+<li><a href="#distrib">Distribution Packages</a>
+</li>
+<li><a href="#install">Installation</a>
+</li>
+<li><a href="#docs">SDK Documentation</a>
+</li>
+<li><a href="#apps">Applications</a>
+</li>
+<li><a href="#features">Key Features and Bug Fixes</a>
+</li>
+<li><a href="#limitations">Known Defects and Limitations</a>
+</li>
+<li><a href="#bugs">Bug Reports and Feedback</a>
+</li>
+<li><a href="#webpages">Web Pages</a>
+</li>
+</ol>
+<br>
+
+<h3><a name="intro">Introduction</a></h3>
+<blockquote><p>
+Thank you for downloading this release of the SRM Software Development Kit
+(SRM SDK). The SRM SDK is the development environment for creating applications
+that use the Spatial Reference Model (SRM), a conceptual model that allows
+a set of spatial reference frames to be defined in such a way
+that they describe geometric properties uniquely. The SRM supports
+unambiguous specification of the positions, directions,
+distances, and times associated with spatial information. It also defines
+algorithms for precise transformation of positions, directions and distances
+(for a given time) among different spatial reference frames.
+Its spatial operation algorithms are designed to achieve high accuracy
+(typically 1 mm &quot;error ball&quot; accuracy), and
+are optimized to achieve very high performance measures without compromising
+that accuracy.
+</p><p>
+This release has been tested on multiple platforms, such as Linux, Irix, Sun,
+and Windows 98/Me/NT/2000. For detailed information on platform and compiler
+versions supported see the <a href="buildkit_java.htm#top">Build Kit</a>.
+</p><p>
+For help, comments, and bug reports please send email to
+<a href="mailto:help@sedris.org">help@sedris.org</a>. If you are an associate,
+please use <a href="mailto:se-coders@sedris.org">se-coders@sedris.org</a>.
+</p><p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<br>
+
+<h3><a name="distrib">Distribution Packages</a></h3>
+<blockquote><p>
+This version of the SDK contains the Java implementation of the SRM API.
+In addition to source code, pre-compiled Java bytecode can be downloaded
+from the SEDRIS web site (<a href="http://www.sedris.org">www.sedris.org</a>).
+</p><p>
+The following table shows the contents of the different packages and the
+directories you will find in them. Note that the links on the column headers
+take you to the directories, so they may not work depending on your
+distribution and, as in the case of a source distribution, on whether
+you have compiled the libraries and/or applications:
+</p>
+<div align="center"><table width="90%" border="1" cellpadding="3">
+<tr valign="top">
+<td valign="middle" align="center"><strong>Package and Contents</strong></td>
+<td align="left" bgcolor="#e0e0e0" width="40"><strong>bin</strong>:
+<p>Compiled binaries for applications</td>
+<td align="left" bgcolor="#e0e0e0" width="40"><strong>docs</strong>:
+<p>Documentation, including Release Notes and Reference Manual</td>
+<td align="left" bgcolor="#e0e0e0" width="40"><strong>lib</strong>:
+<p>Compiled binaries for libraries</td>
+<td align="left" bgcolor="#e0e0e0" width="40"><strong>src</strong>:
+<p>Complete source code for the libraries and applications</td>
+</tr>
+<tr>
+<td align="left" bgcolor="#e0e0e0"><strong>Complete Suite&nbsp;Source</strong>:
+<ul>
+<li>Libraries
+</li>
+<li>Applications
+</li>
+<li>Documentation
+</li>
+</ul></td>
+<td bgcolor="#c0c0c0">&nbsp;</td>
+<td align="center">X</td>
+<td bgcolor="#c0c0c0">&nbsp;</td>
+<td align="center">X</td>
+</tr><tr>
+<td align="left" bgcolor="#e0e0e0"><strong>Complete Suite&nbsp;Binary</strong>:
+<ul>
+<li>Libraries and available extensions
+</li>
+<li>Applications
+</li>
+<li>Documentation
+</li>
+</ul></td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td align="center">X</td>
+<td bgcolor="#c0c0c0">&nbsp;</td>
+</tr>
+</table></div>
+<p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<br>
+
+<h3><a name="install">Installation</a></h3>
+<blockquote><p>
+The SRM SDK is distributed as a GNU-zipped tar file for Unix systems and a Zip
+file in Win32 systems.
+</p><p>
+To install, extract the contents of the compressed file:
+</p>
+<dl>
+<dt><strong>Unix</strong>
+<dd>
+<p>Use the &quot;tar&quot; and &quot;gzip&quot; commands to extract the contents of the SDK:
+<blockquote><pre>gunzip -c sdk_file.tgz | tar xf -</pre></blockquote>
+using the appropriate filename for &quot;sdk_file.tgz&quot;.
+<p>If you have GNU tar installed, you can use the following command instead:
+<blockquote><pre>tar xzf sdk_file.tgz</pre></blockquote>
+<p>
+<dt><strong>Win32</strong>
+<dd>
+<p>Use <a href="http://www.winzip.com">WinZip</a> or other
+decompression utility to extract the contents of the downloaded file.
+</dl>
+
+<p>
+See the <a href="buildkit_java.htm#top">Build Kit</a> page for information on
+how to compile and link the software, and how to link your applications or
+libraries against this SDK.
+</p><p>
+Note that there is only one SRM JAR file and it is compatible
+with all platforms with the Java 5 Runtime Environment installed.
+</p><p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<br>
+
+<h3><a name="docs">SDK Documentation</a></h3>
+<blockquote><p>
+The SDK Documentation is divided into the following areas:
+</p>
+<dl>
+<dt><a href="index.htm">Release Notes</a> (this document)</dt>
+<dd>Describes the capabilities of this release, its contents, and
+supported platforms and compilers.<br><br></dd>
+<dt><a href="buildkit_java.htm">Build Kit.</a><br><br></dt>
+<dt><a href="srm_java_api/index.htm">SRM API Documentation</a><br><br></dt>
+<dt><a href="users_guide_java.htm">SRM Users' Guide</a><br><br></dt>
+<dt><a href="SRM_VA_Users_Manual_V17.pdf">SRM Velocity/Acceleration (Orientation) Users' Manual</a><br><br></dt>
+</dl>
+<p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<br>
+
+<h3><a name="apps">Applications</a></h3>
+<blockquote><p>
+This release includes a sample application that demonstrates the use of the
+SRM SDK.
+</p><p>
+<strong>Applications:</strong>
+</p><blockquote>
+<dl>
+<dt>Sample SRM Access</dt>
+<dd>This application converts a 3D coordinate from
+    a Celestiodetic SRF to a Celestiocentric SRF.
+</dd>
+</dl>
+</blockquote>
+<p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<br>
+
+<h3><a name="features">Key Features and Bug Fixes</a></h3>
+<blockquote><p>
+The list below summarizes the key features and changes of the SRM SDK in this
+release.
+</p>
+
+<ul>
+<li>Updated to comply with Java 5 and up Runtime Environments.
+    This included changing most classes that previously were
+    subclasses of SRM's Enum.java to be Java enums instead.
+    (The SRM's Enum.java was renamed to SrmEnum.java).
+</li>
+<li>New orientation representation classes and methods replacing
+    the existing orientation methods:
+<ul>
+<li>Axis-angle
+</li>
+<li>Euler (ZXZ) angles
+</li>
+<li>Matrix 3x3
+</li>
+<li>Quaternion
+</li>
+<li>Tait-Bryan angles
+</li>
+</ul>
+</li>
+<li>New orientation methods replacing the existing pre-4.2
+    orientation methods, and additional methods for conversion
+    of vector quantities (velocity, acceleration) involving orientations:
+<ul>
+<li><strong>computeSRFOrientation:</strong>
+    Sets the values of the orientation object representing the orientation
+       of the source srf (at the source reference location) with respect to
+    the target srf (at the target reference location).
+</li>
+<li><strong>getLocalTangentFrameSRFParameters:</strong>
+    Computes the parameters corresponding to the local tangent frame
+       at the input reference location.
+</li>
+<li><strong>createLococentricEuclidean3DSRF:</strong>
+    Creates a Lococentric Euclidean 3D SRF whose origin is at the
+    input lococentre and the primary and secodary axes are aligned
+    with the input direction axes.
+</li>
+<li><strong>transformOrientation:</strong>
+   Given an orientation with respect to a local tangent frame (LTF_S)
+   associated with a reference location in the source SRF, this method
+   computes the orientation with respect to the local tangent frame
+   (LTF_T) associated with the specified reference location in the
+   target SRF.
+</li>
+<li><strong>transformOrientationCommonOrigin:</strong>
+    Given an orientation with respect to a local tangent frame (LTF_S)
+    associated with a reference location in the source SRF, this method
+   computes the orientation with respect to the local tangent frame
+   (LTF_T) associated with the specified reference location in the
+   target SRF.  LTF_S and LTF_T have a common origin.
+</li>
+<li><strong>transformVectorInBodyFrame:</strong>
+    Given a vector in a body frame (or in general any linear reference frame)
+    whose orientation with respect to the local tangent frame (LTF_S)
+    that is associated with a reference location in the source SRF,
+    this method computes the vector in the local tangent frame
+    (LTF_T) associated with the specified reference location in the target SRF.
+</li>
+<li><strong>transformVectorInBodyFrameCommonOrigin:</strong>
+    Given a vector in a body frame (or in general any linear reference frame)
+    whose orientation with respect to the local tangent frame (LTF_S) that is
+    associated with a reference location in the source SRF, this method
+    computes the vector in the local tangent frame (LTF_T) associated with the
+    specified reference location in the target SRF.
+    LTF_S and LTF_T have a common origin.
+</li>
+<li><strong>transformVector:</strong>
+    Given a vector in the local tangent frame (LTF_S) associated with a
+    reference location in the source SRF, this method computes the vector in
+    the local tangent frame (LTF_T) associated with the specified
+    reference location in the target SRF.
+</li>
+<li><strong>transformVectorCommonOrigin:</strong>
+    Given a vector in the local tangent frame (LTF_S) associated with a
+    reference location in the source SRF, this method computes the vector
+    in the local tangent frame (LTF_T) associated with the specified
+    reference location in the target SRF.
+    LTF_S and LTF_T have a common origin.
+</li>
+</ul>
+</li>
+<li>New Military Grid Reference System (MGRS) support for the Coord3D class.
+</li>
+<li>Renamed SRM_Japan_RPCS.java to SRM_Japan_Rectangular_Plane_CS.java
+</li>
+<li>Added experimental ORMs and RTs to support NGA golden data.
+</li>
+<li>Added a static getImplVerInfo() method in the BaseSRF class to return
+    the SRM Java implementation version number.
+</li>
+<li>Fixed a problem related to geodesic distance computation when the two
+    input coordinates are on the same parallel.
+</li>
+<li>Fixed coordinate conversion formulation involving Lambert Conformal Conic
+    (LCC) SRFs. CD - LCC and LCC - CD coordinate conversions have been
+    updated to prevent a loss of accuracy near the poles.
+</li>
+<li>Fixed coordinate conversion formulation involving Transverse Mercator (TM)
+    SRFs for spherical ORMs (CD - TM and TM - CD conversions).
+</li>
+<li>The coordinate component ordering for Local Space Polar and for
+    Planetodetic have been changed so that they are explicitly
+    represented as right-handed systems.
+</li>
+<li>Solar Magnetic Dipole and Solar Magnetic Ecliptic have been
+    reformulated as Euclidean rather than angular coordinate systems,
+    in accordance with SRM edition 2.
+</li>
+</ul>
+<p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<br>
+
+
+<h3><a name="limitations">Known Defects and Limitations</a></h3>
+<blockquote>
+<ul>
+<li>Conversion involving the Local Tangent Space Azimuthal Spherical SRFT is not fully tested.
+</li>
+<li>The calculateVerticalSeparationOffset() method does not support the EGM_84 DSS.
+</li>
+<li>The conversion involving Local Space Rectangular 2D SRF only supports positive forward directions.
+</li>
+<li>The instanceAbstractSpaceCoordinate() method is not implemented.
+</li>
+<li>The &quot;get natural region&quot; methods only support the UTM and GTRS SRF sets.
+</li>
+</ul>
+<p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<br>
+
+
+
+<h3><a name="bugs">Bug Reports and Feedback</a></h3>
+<blockquote><p>
+Questions, comments, and bug reports should be sent to
+<a href="mailto:help@sedris.org">help@sedris.org</a>.
+</p><p>
+If you are an associate, please send email to
+<a href="mailto:se-coders@sedris.org">se-coders@sedris.org</a>.
+</p><p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<br>
+
+<h3><a name="webpages">Web Pages</a></h3>
+<blockquote><p>
+These links require Internet access.
+</p>
+<ul>
+<li><a href="http://www.sedris.org/">SEDRIS (www.sedris.org)</a>
+</li>
+<li><a href="http://tools.sedris.org/">SEDRIS Tools</a>
+</li>
+<li><a href="http://www.sedris.org/pro_trpl.htm">SEDRIS Documents</a>
+</li>
+</ul>
+<p>
+Return to: <a href="#top">Top</a>
+</p></blockquote>
+<p>
+Copyright &copy; 2010 <a href="http://www.sedris.org">SEDRIS</a>&#153;
+
+</p>
+</body>
+</html>

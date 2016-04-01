@@ -1,0 +1,2585 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>SRM SDK - Java Users' Guide</title>
+</head>
+<body bgcolor="#ffffff">
+
+<div align="center">
+<h1><a name="top">Java API Users' Guide</a></h1>
+</div>
+<div align="center">
+<h3>
+SRM SDK Release 4.4.0
+</h3>
+<h3>
+January 21, 2010
+</h3>
+</div>
+
+<p>
+<ol>
+<li><a href="#intro">Introduction</a>
+</li>
+<li><a href="#concepts">SRM Concepts</a>
+</li>
+<li><a href="#capability">SRM Capability</A>
+</li>
+<li><a href="#conversion_types">Conversion Types</A>
+</li>
+<li><a href="#typical_usage">Typical Usages</A>
+</li>
+<li><a href="#sample_app">Sample Application</A>
+</li>
+</ol>
+
+<h3><a name="intro">Introduction</a></h3>
+<p>
+Spatial information processing requires a robust capability to describe
+geometric properties such as position, direction and distance. Information
+may be spatially referenced to local structures
+(Example: building interiors) and regions (Example: cities), or spatially
+referenced to the Earth as a whole (Example: global weather). Information
+may be spatially referenced to other celestial bodies (Examples:
+astronomical, orbital, and geomagnetic observations). Information may also
+be spatially referenced to objects defined within contexts such as
+virtual realities (Example: 3D models).
+In each of these cases, a spatial reference frame is defined, with respect to
+which the values of geometric properties may be determined.
+</p><p>
+It is often necessary to represent position in several different
+spatial reference frames, simultaneously, according to the context in which
+the position is to be used. Each spatial reference frame corresponds to a
+particular way of expressing position. Spatial reference frames may be
+relative to moving objects (Examples: planets and spacecraft), and
+therefore have values that are a function of time. It is necessary to
+specify the time to which the spatial position refers, and the time
+for which the spatial reference frame is defined.
+</p><p>
+The Spatial Reference Model (SRM) defines the conceptual model and the
+methodologies that allow the description, and transformation or
+conversion, of geometric properties within or among
+spatial reference frames. The SRM supports unambiguous specification of the
+positions, directions, distances, and times associated with spatial
+information. It also defines algorithms for precise transformation of
+positions, directions and distances among different spatial reference frames.
+</p><p>
+<h3><a name="concepts">SRM Concepts</a></h3>
+<p>
+The SRM provides an integrated framework and precise terminology for
+describing spatial concepts and operations on spatial information (including
+positions, directions, and distances):
+</p>
+
+<ol type="1">
+<li>Spatial positions are identified by coordinates in a spatial coordinate
+system. The collection of spatial positions associated with a spatial object
+of interest, such as the Earth, is called its object-space.
+</li>
+<li>A spatial reference frame specifies a spatial coordinate system by
+combining an abstract coordinate system with an object reference model.
+An abstract coordinate system may be combined with many different
+object reference models. Thus, a geodetic coordinate tied to the
+Earth object reference model WGS_1984 does not identify the same place as
+when tied to the Earth object reference model EUROPEAN_1950, or when tied
+to an object reference model for Mars.
+</li>
+<li>An abstract coordinate system associates coordinates with positions in
+an abstract Euclidean space, which is called its position-space. Abstract
+coordinate systems are defined independently of any object-space. There are
+many spatial spherical coordinate systems for a given object-space, but there
+is only one abstract spherical coordinate system for a position-space.
+</li>
+<li>An object reference model determines a precise relationship between
+position-space and the object-space for a spatial object of interest.
+Different object reference models for the Earth relate position-space to the
+object-space of the Earth in different ways. Thus, the object reference model
+WGS_1984 relates the position-space x-axis to the direction from the
+Earth's center of mass towards the intersection of the Greenwich meridian
+with the equator, while the object reference model EARTH_INERTIAL_J2000r0
+relates the position-space x-axis to the direction from the
+Earth's center of mass towards the first point of Aries (see 4.5 and Clause 7).
+</li>
+<li>The position-space to object-space relationship determined by
+an object reference model is expressed mathematically by a length-preserving
+embedding function called a normal embedding.
+</li>
+<li>A reference datum is a geometric primitive that relates measurements
+and/or geometric characteristics of object-space to position-space.
+Object reference models use reference datums to specify the position-space
+to object-space relationship. An object reference model may also use
+reference datums to model a geometric aspect of a spatial object. Thus,
+an oblate ellipsoid reference datum may be used to model the figure of the
+Earth or other celestial bodies.
+</li>
+<li>Temporal coordinate systems are introduced to describe the
+time-varying characteristics of spatial reference frames.
+</li>
+<li>Vertical offset surfaces are introduced to define heights with respect to
+equipotential or other complex surfaces. In particular, the
+vertical offset surface EGM96_GEOID represents the
+geopotential surface defined by the WGS 84 EGM 96 Earth Gravitational Model
+that is closely associated with the mean ocean surface.
+</li>
+</ol>
+<p align="left">
+The relationships among some of these concepts are depicted in the following
+figure. An abstract coordinate system is based on the underlying Euclidean
+structure of position-space. The reference datums that comprise the
+object reference model determine how position-space relates to
+object-space. That relationship is mathematically expressed by a normal
+embedding. A spatial reference frame combines the abstract coordinate system
+with the object reference model to specify a spatial coordinate system. This
+allows positions to be expressed relative to a spatial object of interest, such
+as the Earth.
+</p>
+<div align="center">
+<img src="SRF.PNG" alt="Spatial Reference Frame (SRF)" width="650" height="312">
+</div>
+
+<h4><a name="srf">Spatial Reference Frame</a></h4>
+
+<p>
+A <em>spatial coordinate system</em> is a means of associating a unique
+coordinate with a point in object-space. It is defined by binding an abstract
+Coordinate System (<acronym>CS</acronym>) to a normal embedding. A
+<em>spatial reference frame</em> is a specification of a
+spatial coordinate system for a region of object-space.
+It is formed by the binding of an abstract coordinate system to the normal
+embedding specified by an Object Reference Model (<acronym>ORM</acronym>) for
+that object. A full specification specifies the CS and the ORM and includes
+values for <acronym>CS</acronym> parameters, if any, and a specification of
+the region of object-space. Some or all <acronym>CS</acronym> parameters
+may be bound by <acronym>ORM</acronym> parameters. In particular, a CS based
+on an oblate ellipsoid (or sphere) must match the parameters of the oblate
+ellipsoid (or sphere) Rerefence Datum of the <acronym>ORM</acronym>.
+</p><p>
+A <em>spatial reference frame template</em> is an abstraction of a collection of
+spatial reference frames that share the same abstract coordinate system,
+coordinate system parameter binding rules, and similar <acronym>ORM</acronym>s
+that model the same spatial object type. Spatial reference frames may be
+organized into specified sets so as to form an atlas for a large region of
+space. The SRM specifies a collection of spatial reference frame templates,
+realizations of those templates, and sets of those realizations.
+</p><p>
+The SRM defines the following SRF Templates (SRFT):
+</p>
+<ol type="1">
+<li>Celestiocentric (CC)
+</li>
+<li>Local Space Rectangular 3D (LSR_3D)
+</li>
+<li>Celestiodetic (CD)
+</li>
+<li>Planetodetic (PD)
+</li>
+<li>Local Tangent Space Euclidean (LTSE)
+</li>
+<li>Local Tangent Space Azimuthal Spherical (LTSAS)
+</li>
+<li>Local Tangent Space Cylindrical (LTSC)
+</li>
+<li>Lococentric Euclidean 3D (LCE_3D)
+</li>
+<li>Celestiomagnetic (CM)
+</li>
+<li>Equatorial Inertial (EI)
+</li>
+<li>Solar Ecliptic (SEC)
+</li>
+<li>Solar Equatorial (SEQ)
+</li>
+<li>Solar Magnetic Ecliptic (SME)
+</li>
+<li>Solar Magnetic Dipole (SMD)
+</li>
+<li>Heliospheric Aries Ecliptic (HAEC)
+</li>
+<li>Heliospheric Earth Ecliptic (HEEC)
+</li>
+<li>Heliospheric Earth Equatorial (HEEQ)
+</li>
+<li>Mercator (M)
+</li>
+<li>Oblique Mercator Spherical (OMS)
+</li>
+<li>Transverse Mercator (TM)
+</li>
+<li>Lambert Conformal Conic (LCC)
+</li>
+<li>Polar Stereographic (PS)
+</li>
+<li>Equidistant Cylindrical (EC)
+</li>
+<li>Local Space Rectangular 2D (LSR_2D)
+</li>
+<li>Local Space Azimuthal LSA)
+</li>
+<li>Local Space Polar (LSP)
+</li>
+</ol>
+<p>
+The SRM defines the following SRF Sets and their intrinsic SRF template types:
+<ol type="1">
+<li>Alabama State Plane Coordinate System (SPCS) - TM
+</li>
+<li>Geo-Tile Reference System Global Coordinate System (GTRS GCS) - LTSE
+</li>
+<li>Japan Rectangular Plane CS - TM
+</li>
+<li>Lambert NTF - LCC
+</li>
+<li>Universal Polar Stereographic (UPS) - PS
+</li>
+<li>Universal Transverse Mercator (UTM) - TM
+</li>
+<li>Wisconsin State Plane Coordinate System (SPCS) - LCC
+</li>
+</ol>
+
+<p>
+The SRM defines the following Standard SRFs and their intrinsic
+SRF template types:
+</p>
+<ol type="1">
+<li>British National Grid (BNG) - TM
+</li>
+<li>British OSGRS80 Grid - TM
+</li>
+<li>Delaware State Plane Coordinate System (SPCS) 1983 - TM
+</li>
+<li>Geocentric WGS 1984 - CC
+</li>
+<li>Geodetic Australia 1984 - CD
+</li>
+<li>Geodetic WGS 1984 - CD
+</li>
+<li>Geodetic North America 1983 - CD
+</li>
+<li>Irish Grid 1965 - TM
+</li>
+<li>Irish Transverse Mercator 1989 - TM
+</li>
+<li>Lambert 1993 - LCC
+</li>
+<li>Lambert II Wide - LCC
+</li>
+<li>Mars Planetocentric 2000 - CD
+</li>
+<li>Mars Planetographic 2000 - PD
+</li>
+<li>Maryland State Plane Coordinate System (SPCS) 1983 - LCC
+</li>
+</ol>
+<p>
+
+<h4><a name="rd">Reference Datum (RD)</a></h4>
+<p>
+A <em>reference datum</em> is a geometric primitive in position-space.
+Reference datums are points or directed curves in 2D position-space or points,
+directed curves or oriented surfaces in 3D position-space.
+</p><p>
+A reference datum is <em>bound</em> when the reference datum in position-space
+is identified with a corresponding constructed entity (i.e., a measured or
+conceptual geometric aspect of a spatial object) in object-space. The term
+&quot;corresponding&quot; in this context means that each position-space
+reference datum is bound to a constructed geometric entity of the same
+geometric object type. That is, position-space points are bound to
+object-space points, position-space lines to object-space lines,
+position-space curves to object-space curves, position-space planes to
+object-space planes, and position-space surfaces to object-space surfaces.
+</p>
+
+<h4><a name="orm">Object Reference Model (<acronym>ORM</acronym>)</a></h4>
+<p>
+A set of bound Reference Datums can be selected so as to be compatible with
+only one normal embedding. In this way, a set of bound RDs with properly
+constrained relationships can specify a unique normal embedding. Such a
+constrained set of bound RDs is called an object reference model.
+</p><p>
+An <em>object reference model</em> (<acronym>ORM</acronym>) for a
+spatial object is a set of bound <acronym>RD</acronym>s for which
+there exists exactly one normal embedding that is compatible with each
+bound <acronym>RD</acronym> in the set. In the 3D case, this unique embedding
+shall also be right-handed.
+</p><p>
+An <acronym>ORM</acronym> is <em>object-fixed</em> if each of its RD bindings
+are object-fixed; otherwise it is called <em>object-dynamic</em>. The
+object-fixed definition assumes that the object itself is not changing in time
+by an amount significant for the accuracy and time scale of an application. The
+normal embedding determined by an <acronym>ORM</acronym> is, correspondingly,
+either an object-fixed embedding or an object-dynamic embedding.
+</p><p>
+Examples of <acronym>ORM</acronym>s are:
+World Geodesic System 1984 (WGS 1894), and COAMPS,
+and Heliocentric Aries Ecliptic.
+</p>
+
+<h4><a name="rt">Reference Transformation (RT)</a></h4>
+
+A reference transformation
+(RT) for an ORM is a similarity transformation from the ORM normal embedding to
+the normal embedding of the reference ORM for that object, ORM<sub>R</sub>. The
+reference transformation for an ORM, ORM<sub>S</sub>, shall be denoted by H<sub>SR</sub>.
+</p><p>
+For 3D <acronym>ORM</acronym>s, a reference transformation shall be specified
+by the seven parameters of the corresponding seven-parameter embedding
+specification. For 2D <acronym>ORM</acronym>s, a reference transformation shall
+be specified by the four parameters of the corresponding
+four-parameter embedding specification.
+</p><p>
+For a list of supported reference tranformations for each ORM see the
+<a href="orm_rt.htm">ORM-RT Relationship Table</a>. Notice that the leading
+part of each RT name is the name of the ORM with which it is associated.
+</p>
+
+<h4><a name="cs">Coordinate System</a></h4>
+<p>
+An abstract coordinate system is a means of identifying positions in
+position-space by coordinate n-tuples. An abstract coordinate system is
+completely defined in terms of the mathematical structure of position-space. In
+the SRM, the term &quot;coordinate system&quot; is defined to mean
+&quot;abstract coordinate system&quot;.
+</p><p>
+A temporal coordinate system is defined as a means of
+identifying events in the time continuum by coordinate 1-tuples using an
+abstract coordinate system of coordinate system type 1D. A spatial coordinate
+system is defined as an abstract coordinate system suitably combined with a
+normal embedding as a means of identifying points in object-space by coordinate
+n-tuples.
+</p>
+
+<h4><a name="coord">Coordinate</a></h4>
+<p>
+A coordinate is an element of the coordinate system domain. In particular, if
+the domain is a subset of 3D Euclidean space (R3), each coordinate is called a
+<em>3D coordinate</em>. If the domain is a subset of 2D Euclidean space (R2),
+each coordinate is called a <em>2D coordinate</em>.
+Surface coordinates are defined as the projection of the 3D coordinate onto
+the surface of a RD.
+</p><p>
+Examples of coordinates are: Celestiocentric 3D coordinate,
+Local Space Rectangular 2D coordinate, and
+Transverse Mercator surface coordinate.
+</p>
+
+<h3><a name="capability">SRM Capability</a></h3>
+The SRM API supports the following functionality:<p>
+<ol type="1">
+<li>Instantiation and access
+<ol type="a">
+<li>SRFs
+<ol type="i">
+<li>SRF templates (e.g., LSR 3D, TM, Celestiodetic, Celestiocentric)
+</li>
+<li>SRF set members (e.g., UTM zone 12 Northern Hemisphere, GTRS cell 1234, UPS Northern Pole)
+</li>
+<li>Standard SRFs (e.g., British National Grid)
+</li>
+</ol>
+</li>
+<li>Coordinates
+<ol type="i">
+<li>2D coordinates
+</li>
+<li>3D coordinates
+</li>
+<li>Surface coordinates
+</li>
+</ol>
+</li>
+<li>Directions
+</li>
+<li>Orientations
+</li>
+</ol>
+</li>
+<li>Conversion
+<ol type="a">
+<li>Coordinate conversion between SRFs
+</li>
+<li>Direction conversion between SRFs
+</li>
+<li>Orientation conversion between SRFs
+</li>
+</ol>
+</li>
+<li>Validation
+<ol type="a">
+<li>Coordinate validation within a SRF
+</li>
+<li>Direction validation within a SRF
+</li>
+<li>Orientation validation within a SRF
+</li>
+</ol>
+</li>
+<li>Calculation
+<ol type="a">
+<li>Euclidean distance
+</li>
+<li>Geodesic distance
+</li>
+<li>Point scale
+</li>
+<li>Vertical separation offset
+</li>
+<li>Convergence of the Meridian
+</li>
+<li>Map azimuth
+</li>
+<li>Natural Extent (zone)
+</li>
+</ol>
+</li>
+</ol>
+
+<p>
+Note that this SRM release only supports the EGM_96 Geoid and
+WGS_84 Ellipsoid DSS codes for the Vertical Separation Offset
+calculation. See the Release Notes for additional information.
+</p>
+
+<h3><a name="conversion_types">Conversion Types</a></h3>
+
+There are three types of coordinate conversions:
+
+<ol>
+<li>Direct
+<p>
+These are conversions that have an algorithm implemented between the source
+SRF and the target SRF.For instance, the coordinate conversion from a
+Celestiodetic SRF to a Celestiocentric SRF is a direct conversion.This type
+of conversion does not involve intermediate SRFs for its computation and
+thus they are most efficient.
+</p></li>
+
+<li>Indirect (<i>a.k.a</i>.&quot;chained&quot; or &quot;transitive&quot;)
+<p>
+These conversions are chains of direct conversions, converting first from the
+source SRF to intermediate SRFs, then to the
+target SRF. Consequently, these conversions typically take more time to be
+executed.For instance, the coordinate conversion from
+a Transverse Mercator SRF to a Celestiocentric SRF is an indirect conversion
+going through an intermediary conversion to Celestiodetic SRF.
+</p></li>
+
+<li>Reflexive
+<p>
+Reflexive conversions are the cases where the source and the target SRFs are of
+the same class. The trivial case of this type of conversion is when the source
+and the target SRFs have the exact same parameter values.In that case, the
+identity transformation is applied to the source coordinate.Another example,
+when converting from a CD SRF to another CD SRF with a different ORM/RT pair,
+a datum shift is performed by converting the coordinate from the source CD SRF
+to an intermediate CC SRF, apply the datum shift, and then to the
+target CD SRF.
+</p></li>
+</ol>
+<p>
+The type of conversion applied to the coordinates is transparent to the users.
+The users can invoke the SRM_changeCoordinateSRF() method, regardless of
+whether the conversion is direct, indirect, or reflexive. The API will perform
+the conversion in a most efficient way.If a conversion is not supported
+between the two given SRFs, then the call to
+SRM_changeCoordinateSRF() will raise an exception.
+</p><p>
+The chart below is provided as a reference to indicate which coordinate
+conversions are supported in SRM Version 4.2.0.Empty cells indicate
+conversions not supported in 4.2.0.
+</P>
+<ul>
+<li>D - directly supported conversion</li>
+<li>I - indirectly supported conversion </li>
+<li>R - reflexive conversion</li>
+</ul>
+</P>
+
+<div align="center">
+<table border="1" cellspacing="1" cellpadding="3" bgcolor="#ffffff">
+<tr bgcolor="#808080"><th scope="col" bgcolor="#ffffff">
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LSA
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+CC
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+CD
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+CM
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+EC
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+EI
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+HAEC
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+HEEC
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+HEEQ
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LCC
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LCE_3D
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LSR_2D
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LSR_3
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LTSAS
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LTSC
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LTSE
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+M
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+OM
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+PD
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+LSP
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+PS
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+SEC
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+SEQ
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+SME
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+SMD
+</font>
+</th><th align=center scope="col"><font color="#ffffff" size="-1">
+TM
+</font>
+</th>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+LSA
+<td align="center"><font size="-1">
+R
+</font></td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center"><font size="-1">
+D
+</font></td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center"><font size="-1">
+I
+</font></td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+CC
+</font></td>
+<td align="center">&nbsp;</td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align="center">&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+CD
+</font></td>
+<td align="center">&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align="center">&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+CM
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+EC
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+EI
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+HAEC
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+HEEC
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+HEEQ
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+LCC
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">LCE_3D</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+LSR_2D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align="center">&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+LSR_3D
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+LTSAS
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font><font color="#ffffff" size="-1">.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+LTSC
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.</font><font size="-1">I
+</font><font color="#ffffff" size="-1">
+&nbsp;</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font><font color="#ffffff" size="-1">
+&nbsp;</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.</font><font size="-1">I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+LTSE
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+M
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+OM
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I&nbsp;
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+PD
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I&nbsp;
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I&nbsp;
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+LSP
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+PS
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I&nbsp;
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font color="#ffffff" size="-1">
+.</font><font size="-1">I
+</font></td>
+<td align=center><font size="-1">
+I
+</font><font color="#ffffff" size="-1">
+.
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+SEC
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+SEQ
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+SME
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+SMD
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+R
+</font></td>
+<td align=center>&nbsp;</td>
+</tr>
+
+<tr>
+<td bgcolor="#ffff80"><font size="-1">
+TM
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+D
+</font></td>
+<td align=center><font size="-1">
+I</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I&nbsp;
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center><font size="-1">
+I
+</font></td>
+<td align=center>&nbsp;</td>
+<td align=center>&nbsp;</td>
+<td align=center><font size="-1">
+R
+</font></td>
+</tr>
+</table>
+</div><br>
+</td></tr>
+
+
+<h3><a name="typical_usage">Typical Usages</a></h3>
+
+A few typical API usages are described is this section.
+
+<h4><a name="convert">Convert a coordinate from one SRF to another</a></h4>
+
+In order to convert a coordinate from one SRF to another, the user has to:
+<ol type="1">
+<li>Instantiate the SRF to which the coordinate to be converted (source)
+is associated.
+</li>
+<li>Instantiate the SRF to which the resulting converted coordinate (target)
+is associated.
+</li>
+<li>Instantiate the source coordinate.
+</li>
+<li>Instantiate the target coordinate with default values.
+</li>
+<li>Compute the target coordinate.
+</li>
+</ol>
+
+The users should re-use the instantiated SRFs for the coordinate conversions
+to minimize the one-time initialization cost.
+The source and target coordinates must be both 2D, 3D, or surface.
+<p>
+The details on how to instantiate SRFs, instantiate coordinates and convert
+coordinates are as follows:
+
+<ol type="1">
+<li>Instantiate an SRF
+<p>
+There are three ways to instantiate SRFs depending whether they are instances
+of SRF Templates, SRF Sets, or standard SRFs.  Once an SRF is instantiated, its
+parameter values cannot be changed:
+<p>
+<ol type="a">
+<li> From an SRF Template:
+<p>
+There are 26 SRF Template classes in SRM.  These include
+SRF_Celestiodetic, SRF_Celestiocentric, SRF_LocalSpaceRectangular3D,
+and Transverse Mercator.  Use their class constructors to
+instantiate these types of SRFs.  For example, to instantiate a Celestiodetic
+SRF using the WGS 1984 ORM with the Identity RT transformation:
+<pre>
+     SRF_Celestiodetic my_cd_srf = new SRF_Celestiodetic
+                                       ( SRM_ORM_Code.ORM_WGS_1984,
+                                         SRM_RT_Code.RT_WGS_1984_IDENTITY );
+</pre>
+<li> From a SRF Set:
+<p>
+There are 7 SRF Sets currently defined in SRM.  This includes
+Universal Transverse Mercator (UTM), Geo Tile Reference System (GTRS),
+Global Coordinate System (GCS), and Universal Polar Stereographic (UPS).
+Each of these SRF Sets are composed of a well-defined set of members.  For
+example, UTM is composed of 120 members (zones) while GTRS GCS has 59,896
+members (cells). Instances of these SRF Set members can be instantiated by
+invoking the static createSRFSetMember method in the BaseSRF class.
+For example, to create an instance of UTM zone 12 in the Northern hemisphere
+using the WGS 1984 ORM with the Identity reference tranformation:
+<p>
+<pre>
+SRF_TransverseMercator my_utm12_srf = BaseSRF.createSRFSetMember
+                                          ( SRM_SRFS_Code.UNIVERSAL_TRANSVERSE_MERCATOR,
+                                            SRM_SRFSM_UTM_Code.SRFSMUTM_ZONE_12_NORTHERN_HEMISPHERE,
+                                            SRM_ORM_Code.ORM_WGS_1984,
+                                            SRM_RT_Code.RT_WGS_1984_IDENTITY );
+</pre>
+The SRF template type for the Universal Transverse Mercator SRF is intrinsically
+Transverse Mercator. In other words, the instantiated UTM SRF is actually an instance
+of the Transverse Mercator SRF Template, and therefore, supports all the methods
+defined for that SRF Template.  Likewise, for example, a GTRS GCS SRF is intrinsically
+an instance of the Local Tangent Space Euclidean SRF Template.
+<p>
+<li> From a Standard SRF:
+<p>
+There are 14 Standard SRFs currently defined in SRM.  These include British
+National Grid Airy (BNG), Irish Grid, and the Maryland State Plane Coordinate
+System (SPCS).  Instances of these Standard SRFs can be instantiated by invoking
+the static createStandardSRF() method in the BaseSRF class using the proper
+SRF code.  For example, to
+instantiate an instance of BNG with the OSGB 1936 England reference tranformance:
+<p>
+<pre>
+SRF_TransverseMercator my_bng_stf = BaseSRF.createStandardSRF( SRM_SRF_Code.SRF_BRITISH_NATIONAL_GRID_AIRY,
+                                                               SRM_RT_Code.RT_OSGB_1936_ENGLAND);
+</pre>
+The SRF template type for the British National Grid SRF is intrinsically
+Transverse Mercator. In other words, the instantiated BNG SRF is actually an instance
+of the Transverse Mercator SRF Template, and therefore, supports all the methods
+defined for that SRF Template.  Likewise, for example, a Maryland SPCS SRF is
+intrinsically an instance of the Lambert Conformal Conic SRF Template.
+<p>
+The ORM parameter is pre-defined for each standard SRF.  Users can only specify
+the reference transformation parameter that are applicable to that particular ORM.  The pre-specified ORMs for the standard SRFs are as follows:<p>
+<ol type="i">
+<li>British National Grid Airy (BNG) ==> ORM_OSGB_1936
+<li>British OSGRS80 Grid ==> ORM_ETRS_1989
+<li>Delaware State Plane Coordinate System (SPCS) 1983 ==> ORM_N_AM_1983
+<li>Geocentric WGS 1984 ==> ORM_WGS_1984
+<li>Geodetic Australia 1984 ==> ORM_AUSTRALIAN_GEOD_1984
+<li>Geodetic WGS 1984 ==> ORM_WGS_1984
+<li>Geodetic North America 1983 ==> ORM_N_AM_1983
+<li>Irish Grid 1965 ==> ORM_IRELAND_1965
+<li>Irish Transverse Mercator 1989 ==> ORM_ETRS_1989
+<li>Lambert 1993 ==> ORM_RGF_1993
+<li>Lambert II Wide ==> ORM_NTF_1896_PM_PARIS
+<li>Mars Planetocentric 2000 ==> ORM_MARS_SPHERE_2000
+<li>Mars Planetographic 2000 ==> ORM_MARS_2000
+<li>Maryland State Plane Coordinate System (SPCS) 1983 ==> ORM_N_AM_1983
+</ol>
+
+</ol>
+<p>
+<li>Instantiate a Coordinate
+<p>
+Each SRF Template has its specific coordinates defined.  The coordinates are only
+valid when associated with a specific SRF.  Depending on the SRF instantiated, 2D,
+3D or surface coordinates can be instantiated from it.  There are mainly two way to
+instantiate coordinates:
+<p>
+<ol type="a">
+<li> Using methods in SRF:
+<p>
+A SRF instance can instantiate a coordinate associated with the SRF using the createCoordinateXX()
+method, where &quot;XX&quot; can be &quot;2D&quot;, &quot;3D&quot;, and &quot;Surf&quot; depending on the STF.  For example, to
+instantiate a 3D coordinate for a Celestiodetic SRF:
+<pre>
+Coord3D_Celestiodetic my_cd_3d_coord
+                   = (Coord3D_Celestiodetic)(my_cd_srf.createCoordinate3D( 0.8987, 0.5645, 1000.0 ));
+</pre>
+	     Another example to instantiate a UTM surface coordinate for a UTM SRF:
+<p> <pre>
+CoordSurf_TransverseMercator my_utm_surf_coord
+                   = (CoordSurf_TransverseMercator)
+                                  (my_utm12_srf.createSurfaceCoordinate( 500.0, 320.0 ));
+</pre>
+Notice that the instantiate UTM SRF is intrinsically
+a TM SRF, and therefore, supports the createCoordinate3D method defined in the
+TM SRF Template class.  Consequently, the surface coordinate instantiated by the UTM SRF
+is of CoordSurf_TransverseMercator class.
+<p>
+<li> Using the coordinate class constructors
+<p>
+Each coordinate class takes in its constructor a SRF parameters to which the
+coordinate is associated.  For example, to instantiate a 3D coordinate for a
+Celestiodetic SRF:
+<pre>
+Coord3D_Celestiodetic my_cd_3d_coord
+                   = new Coord3D_Celestiodetic( my_cd_srf, 0.17865, 0.01234, 1000.0 );
+</pre>
+To instantiate a UTM surface coordinate for a UTM SRF:
+<p> <pre>
+CoordSurf_TransverseMercator my_utm_surf_coord
+                   = new CoordSurf_TransverseMercator( my_utm12_srf, 500.0, 530.0 );
+</pre>
+</ol>
+<li> Convert a source coordinate from the source SRF to a target SRF
+<p>
+Having instantiated the source and target SRFs and coordinates, invoke the
+changeCoordinateSRF() method of the target SRF to calculate the
+target coordinate and the Valid Region.  For example, to convert a Celestiodetic
+3D coordinate to a Transverse Mercator SRF:
+<pre>
+Coord3D_TransverseMercator my_utm12_3d_coord( my_utm12_srf );
+validRegion = my_utm12_srf.changeCoordinateSRF( my_cd_3d_coord, my_utm12_3d_coord );
+</pre>
+In this example, the 3D Celestiodetic coordinate is converted to a UTM SRF.  The validRegion
+indicates where the resulting UTM coordinate is within the valid, extended or defined
+regions.
+</ol>
+
+<h4><a name="direction">Convert a direction from one SRF to another</a></h4>
+
+The steps to convert a direction (source direction) from its original SRF
+(source SRF) to another SRF (target SRF) resulting in the final direction
+(target direction) is similar to converting a coordinate as follows:
+<p>
+<ol>
+<li> Instantiate a SRF (same as above).
+<li> Instantiate a reference location coordinate (same as above).  The restriction is that
+this coordinate must be a 3D coordinate.
+<li> Instantiate a Direction
+<p>
+A Direction object can be instantiated using the createDirection() method in
+any subclass of BaseSRF_3D.  For example, to instantiate a
+Direction using a Celestiodetic
+3D coordinate &quot;cd_ref_location&quot; associated with and a direction vector (1.0, 2.0, 3.0):
+<pre>
+Direction my_cd_dir = my_cd_srf.createDirection( my_cd_ref_location, {1.0, 2.0, 3.0});
+</pre>
+The Celectiodetic SRF &quot;cd_srf&quot; must be the same one used to instantiate both the
+reference location &quot;cd_ref_location&quot; and the direction object &quot;cd_dir&quot;.
+<p>
+<li> Convert a source Direction from the source SRF to a target SRF
+<p>
+Having instantiated the source and target SRFs and Directions, invoke the
+changeDirectionSRF() method of the target SRF to calculate the
+target direction and the Valid Region.  For example, to convert the Celestiodetic
+direction to a Transverse Mercator SRF &quot;tm_srf&quot;:
+<pre>
+validRegion = my_tm_srf.changeDirectionSRF( my_cd_dir, my_tm_dir);
+</pre>
+In converting a Direction, both its reference location and the
+vector are converted to the target SRF.  The valid region is associated with the
+resulting reference location.
+</ol>
+
+
+<h4><a name=orientation">Compute the orientation of the source SRF (at the source reference location)
+with respect to the target SRF (at the target reference location)</a></h4>
+
+The steps to compute the orientation of the source SRF (at the source reference location)
+with respect to the target SRF (at the target reference location) are as follows:
+<p>
+<ol>
+<li>Instantiate a source SRF.  For example, a CD SRF:
+        <pre>SRF_Celestiodetic cd_srf = new SRF_Celestiodetic
+                                   ( SRM_ORM_Code.ORM_WGS_1984,
+                                     SRM_RT_Code.RT_WGS_1984_IDENTITY );
+</pre></li>
+<li>Instantiate a reference location in the source (CD) SRF.  The restriction is
+    that this coordinate must be a 3D coordinate.
+             <pre>Coord3D_Celestiodetic cd_3d_coord
+                   = new Coord3D_Celestiodetic( cd_srf, 0.8987, 0.5645, 1000.0 );
+</pre></li>
+<li>Instantiate a target SRF.  For example, a CC SRF:
+            <pre>SRF_Celestiocentric cc_srf = new SRF_Celestiocentric
+                                       ( SRM_ORM_Code.ORM_WGS_1984,
+                                         SRM_RT_Code.RT_WGS_1984_IDENTITY );
+</pre></li>
+<li>Instantiate a reference location in the target (CC) SRF.  The restriction is
+    that this coordinate must be a 3D coordinate.
+             <pre>Coord3D_Celestiocentric cc_3d_coord
+                   = new Coord3D_Celestiocentric( cc_srf, 4517590.0, 0.0, 4487350.0 );
+</pre></li>
+<li>Instantiate an orientation of desirable representation class with the
+    default constructor.
+    For example, create an instance of orientation in Tait-Bryan angles
+    representation:
+<p>
+        <pre>OrientationTaitBryanAngles ori_tb = new OrientationTaitBryanAngles();</pre>
+<p></li>
+<li>Set the orientation values based on the two reference locations:
+         <pre>cc_srf.computeSRFOrientation( cd_3d_coord,
+		              cc_3d_coord,
+		              ori_tb );
+</pre></li>
+</ol>
+
+
+<h3><a name="sample_app">Sample Application</a></h3>
+
+The following sample code converts a a 3D coordinate from a Celestiodetic
+SRF to a Celestiocentric SRF using the SRM Java API:
+
+<pre>
+import SRM.*;
+
+public class CdToCcConv
+{
+    public static void main (String args[])
+    {
+	System.out.println( "*** Sample program using SRM Java API to convert a 3D coordinate" );
+	System.out.println( "*** from a Celestiodetic SRF to a Celestiocentric SRF." );
+
+	// Declare reference variables for the CD and CC SRFs
+	SRF_Celestiodetic CdSrf = null;
+	SRF_Celestiodetic CdSrf1 = null;
+	SRF_Celestiocentric CcSrf = null;
+
+	try {
+
+	    // Create a Celestiodetic SRF with WGS 1984
+	    CdSrf = new SRF_Celestiodetic(SRM_ORM_Code.ORM_WGS_1984,
+	    				  SRM_RT_Code.RT_WGS_1984_IDENTITY);
+
+	    // Create a Celesticentric SRF with WGS 1984
+	    CcSrf = new SRF_Celestiocentric(SRM_ORM_Code.ORM_WGS_1984,
+					    SRM_RT_Code.RT_WGS_1984_IDENTITY);
+
+	    // Create a 3D Celestiodetic coordinate with
+	    // longitude           =&gt; 10.0 degrees (note: this input parameter is converted to radians)
+	    // latitude            =&gt; 20.0 degrees (note: this input parameter is converted to radians)
+	    // ellipsopidal height =&gt; 100.0 meters
+	    Coord3D_Celestiodetic CdCoord =
+		(Coord3D_Celestiodetic)CdSrf.createCoordinate3D(Math.toRadians(10.0),
+								Math.toRadians(20.0),
+								100.0);
+
+	    // Instantiate a 3D Celestiocentric coordinate
+	    // This is an alternative method for instantiate a 3D coordinate
+	    Coord3D_Celestiocentric CcCoord = new Coord3D_Celestiocentric( CcSrf );
+
+	    // print out the SRF parameter calues and the coordinate component values
+	    System.out.println("CdSrf parameter =>  \n" + CdSrf);
+	    System.out.println("CcSrf parameter =>  \n" + CcSrf);
+	    System.out.println("CdCoord components (source) => \n" + CdCoord);
+
+	    // convert the 3D Celestiodetic coordinate to 3D Celestiocentric coordinate
+	    SRM_Coordinate_Valid_Region_Code valRegion =
+		CcSrf.changeCoordinateSRF( CdCoord, CcCoord );
+
+	    // print out the values of the resulting 3D Celestiocentric coordinate
+	    System.out.println("CcCoord components (destination) => \n" + CcCoord + " is " + valRegion );
+
+	}
+	catch (SrmException ex)
+        {
+	    // catch SrmException and print out the error code and text.
+	    System.out.println("Exception caught=&gt; " + ex.what() + ", " + ex);
+	}
+    }
+}
+</pre>
+
+Executing the sample code would result the following output:
+<pre>
+*** Sample program using SRM Java API to convert a 3D coordinate
+*** from a Celestiodetic SRF to a Celestiocentric SRF.
+CdSrf parameter =&gt;
+orm: ORM_WGS_1984
+rt: RT_WGS_1984_IDENTITY
+CcSrf parameter =&gt;
+orm: ORM_WGS_1984
+rt: RT_WGS_1984_IDENTITY
+CdCoord components (source) =&gt;
+[ 0.17453292519943295, 0.3490658503988659, 100.0 ]
+CcCoord components (destination) =&gt;
+[ 5904838.698311626, 1041182.3792437915, 2167730.9898430835 ] is VALID
+</pre>
+
+<p>Return to: <a href="#top">Top</a>
+</blockquote>
+<br>
+
+<p>
+Copyright &copy; 2010 <a href="http://www.sedris.org">SEDRIS</a>&#153;
+
+
+</body>
+</html>
