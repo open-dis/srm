@@ -25,13 +25,9 @@
         <version>7</version>
     </parent>
     <scm>
-        <!-- upstream SourceForge connection
-        <url>http://svn.code.sf.net/p/open-dis/code</url>
-        <connection>scm:svn:http://svn.code.sf.net/p/open-dis/code</connection>
-        -->
-        <url>https://github.com/leif81/open-dis-maven</url>
-        <connection>scm:git:ssh://github.com/leif81/open-dis-maven.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/leif81/open-dis-maven.git</developerConnection>
+        <url>https://github.com/open-dis/srm</url>
+        <connection>scm:git:ssh://github.com/open-dis/srm.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/open-dis/srm.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
     <dependencies>
